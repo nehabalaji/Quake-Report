@@ -5,11 +5,14 @@ public class Earth {
     private String mMagnitude;
     private String mPlace;
     private String mDate;
+    private long mTimeInMilliSeconds;
 
-    public Earth(String Magnitude, String Place, String Date) {
+
+
+    public Earth(String Magnitude, String Place, long TimeinMilliSeconds) {
         mMagnitude = Magnitude;
         mPlace = Place;
-        mDate = Date;
+        mTimeInMilliSeconds = TimeinMilliSeconds;
     }
 
     public String getmMagnitude() {
@@ -22,6 +25,10 @@ public class Earth {
 
     public String getmDate() {
         return mDate;
+    }
+
+    public long getmTimeInMilliSeconds(){
+        return mTimeInMilliSeconds;
     }
 }
 
