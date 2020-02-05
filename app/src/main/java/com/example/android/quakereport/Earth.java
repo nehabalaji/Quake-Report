@@ -2,20 +2,20 @@ package com.example.android.quakereport;
 
 public class Earth {
 
-    private String mMagnitude;
+    private double mMagnitude;
     private String mPlace;
     private String mDate;
     private long mTimeInMilliSeconds;
 
 
 
-    public Earth(String Magnitude, String Place, long TimeinMilliSeconds) {
+    public Earth(Double Magnitude, String Place, long TimeinMilliSeconds) {
         mMagnitude = Magnitude;
         mPlace = Place;
         mTimeInMilliSeconds = TimeinMilliSeconds;
     }
 
-    public String getmMagnitude() {
+    public double getmMagnitude() {
         return mMagnitude;
     }
 

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +33,8 @@ public class earthAdapter extends ArrayAdapter<Earth> {
         Earth earth = getItem(position);
 
         TextView magnitude = (TextView) listItemView.findViewById(R.id.mag);
-        magnitude.setText(earth.getmMagnitude());
+        String formattedMagnitude = formatMagnitude(earth.getmMagnitude());
+        magnitude.setText(formattedMagnitude);
 
         String OriginalLOcation = earth.getmPlace();
         String primaryLocation;
@@ -73,6 +75,11 @@ public class earthAdapter extends ArrayAdapter<Earth> {
 
 
 
+    }
+
+    private String formatMagnitude(double magnitude) {
+        DecimalFormat magnitudeFormat = new DecimalFormat("0.0");
+        return magnitudeFormat.format(magnitude);
     }
 
     private String formatTime(Date dateObject) {
