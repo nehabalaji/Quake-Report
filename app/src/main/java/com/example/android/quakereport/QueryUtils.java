@@ -37,8 +37,9 @@ public class QueryUtils {
                 double magnitude = properties.getDouble("mag");
                 String place = properties.getString("place");
                 long time = properties.getLong("time");
+                String url = properties.getString("url");
 
-                Earth earth1 = new Earth(magnitude, place, time);
+                Earth earth1 = new Earth(magnitude, place, time, url);
                 earth.add(earth1);
             }
 
@@ -48,4 +49,6 @@ public class QueryUtils {
         }
         return earth;
     }
+
+
 }

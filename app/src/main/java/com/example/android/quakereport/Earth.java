@@ -6,13 +6,15 @@ public class Earth {
     private String mPlace;
     private String mDate;
     private long mTimeInMilliSeconds;
+    private String mURL;
 
 
 
-    public Earth(Double Magnitude, String Place, long TimeinMilliSeconds) {
+    public Earth(Double Magnitude, String Place, long TimeinMilliSeconds, String url) {
         mMagnitude = Magnitude;
         mPlace = Place;
         mTimeInMilliSeconds = TimeinMilliSeconds;
+        mURL = url;
     }
 
     public double getmMagnitude() {
@@ -29,6 +31,10 @@ public class Earth {
 
     public long getmTimeInMilliSeconds(){
         return mTimeInMilliSeconds;
+    }
+
+    public String getmURL(){
+        return mURL;
     }
 }
 
