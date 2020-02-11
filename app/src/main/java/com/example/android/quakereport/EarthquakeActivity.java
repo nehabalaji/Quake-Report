@@ -17,6 +17,7 @@ package com.example.android.quakereport;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -26,35 +27,60 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity {
-
+    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
+    private earthAdapter mAdapter;
+
+    private class EarthQuakeAsynTask extends AsyncTask<String, Void, List<Earth>>{
+
+        @Override
+        protected List<Earth> doInBackground(String... urls) {
+            if(urls.length <1 || urls[0] == null){
+                return null;
+            }
+            List<Earth> result = QueryUtils.fetchEarthquakeData(urls[0]);
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(List<Earth> data) {
+            mAdapter.clear();
+
+            if(data!=null && !data.isEmpty()){
+                mAdapter.addAll(data);
+            }
+
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
-        // Create a fake list of earthquake locations.
-        ArrayList<Earth> earthquakes = QueryUtils.extractEarthquakes();
 
         // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
-        final earthAdapter earthAdapter = new earthAdapter(this, earthquakes);
+        mAdapter = new earthAdapter(this, new ArrayList<Earth>());
 
-        earthquakeListView.setAdapter(earthAdapter);
+        earthquakeListView.setAdapter(mAdapter);
 
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Earth earth = earthAdapter.getItem(i);
+                Earth earth = mAdapter.getItem(i);
                 Uri earthquakeUri = Uri.parse(earth.getmURL());
                 Intent WebsiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
                 startActivity(WebsiteIntent);
             }
         });
 
+        EarthQuakeAsynTask task = new EarthQuakeAsynTask();
+        task.execute(USGS_REQUEST_URL);
     }
 }
