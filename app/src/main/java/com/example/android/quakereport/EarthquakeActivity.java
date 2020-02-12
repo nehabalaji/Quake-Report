@@ -15,7 +15,12 @@
  */
 package com.example.android.quakereport;
 
+import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,46 +30,55 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity {
+public class EarthquakeActivity extends AppCompatActivity
+implements LoaderManager.LoaderCallbacks<List<Earth>> {
     private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
     private earthAdapter mAdapter;
+    private static final int EARTHQUAKE_LOADER_ID = 1;
 
-    private class EarthQuakeAsynTask extends AsyncTask<String, Void, List<Earth>>{
 
-        @Override
-        protected List<Earth> doInBackground(String... urls) {
-            if(urls.length <1 || urls[0] == null){
-                return null;
-            }
-            List<Earth> result = QueryUtils.fetchEarthquakeData(urls[0]);
-            return result;
-        }
 
-        @Override
-        protected void onPostExecute(List<Earth> data) {
-            mAdapter.clear();
+    @Override
+    public Loader<List<Earth>> onCreateLoader(int i, Bundle bundle) {
+        return new EarthquakeLoader(this, USGS_REQUEST_URL);
+    }
 
-            if(data!=null && !data.isEmpty()){
-                mAdapter.addAll(data);
-            }
-
+    @Override
+    public void onLoadFinished(Loader<List<Earth>> loader, List<Earth> earths) {
+        mEmptyStateTextView.setText(R.string.no_earthquake);
+        View loadingIndicator = findViewById(R.id.loading_spinner);
+        loadingIndicator.setVisibility(View.GONE);
+        mAdapter.clear();
+        if(earths != null && !earths.isEmpty()){
+            mAdapter.addAll(earths);
         }
     }
 
+    @Override
+    public void onLoaderReset(Loader<List<Earth>> loader) {
+        mAdapter.clear();
+    }
 
+    private TextView mEmptyStateTextView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
 
+
+
         // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
+
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+        earthquakeListView.setEmptyView(mEmptyStateTextView);
 
         mAdapter = new earthAdapter(this, new ArrayList<Earth>());
 
@@ -80,7 +94,25 @@ public class EarthquakeActivity extends AppCompatActivity {
             }
         });
 
-        EarthQuakeAsynTask task = new EarthQuakeAsynTask();
-        task.execute(USGS_REQUEST_URL);
+      ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+      if(networkInfo!=null && networkInfo.isConnected()){
+          LoaderManager loaderManager = getLoaderManager();
+          loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+      }
+      else
+      {
+          View loadingIndicator = findViewById(R.id.loading_spinner);
+          loadingIndicator.setVisibility(View.GONE);
+          mEmptyStateTextView.setText(R.string.no_internet);
+      }
+
+
+
+
     }
+
+
+
 }

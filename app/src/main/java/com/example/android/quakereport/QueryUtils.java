@@ -121,6 +121,7 @@ public class QueryUtils {
     public static List<Earth> fetchEarthquakeData (String requestUrl) {
         URL url = createUrl(requestUrl);
 
+
         String jsonResponse = null;
         try {
             jsonResponse = MakeHTTPRequest(url);
